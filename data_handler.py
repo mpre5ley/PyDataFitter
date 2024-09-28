@@ -65,3 +65,18 @@ class DataImporter:
                 for i in range(len(df[col])):
                     df[col][i] = df[col][i][0]
         return df
+    
+    def copy_table_to_df(self, db_engine, table_name):
+        """
+        Load data from the database into a Pandas DataFrame
+        
+        Args:
+        table_name (str): The name of the table to load data from
+         
+        Returns:
+        DataFrame: A Pandas DataFrame containing the data
+        """
+        with db_engine.connect() as conn:
+            data_result = conn.execute(text("SELECT * FROM " + table_name))
+        
+        return (pd.DataFrame(data_result.fetchall(), columns=data_result.keys()))

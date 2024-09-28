@@ -47,33 +47,20 @@ def main():
     # Add x column for ideal function x coordinate
     best_fit.append('x')
 
-    # Load best fit ideal functions from database
-    '''
-    df = pd.DataFrame(columns=best_fit)
-    print(df)
-    with db_engine.connect() as conn:
-        for col in best_fit:
-            best_fit_result = conn.execute(text("SELECT " + col + " FROM ideal_function"))
-            df[col] = best_fit_result.fetchall()
-            #convert tuples to floats
-            for i in range(len(df[col])):
-                df[col][i] = df[col][i][0]
-    '''
-    df = data_import.load_list_to_df(db_engine, best_fit)
+    # Load best fit ideal functions from database into dataframe
+    best_fit_df = data_import.load_list_to_df(db_engine, best_fit)
     
     # Load test data from database into dataframe
-    with db_engine.connect() as conn:
-        test_data_result = conn.execute(text("SELECT * FROM test_data"))
-    test_data_df = pd.DataFrame(test_data_result.fetchall(), columns=test_data_result.keys())
+    test_data_df = data_import.copy_table_to_df(db_engine, 'test_data')
 
     # Find deviation in Y coordinate between test data and best fit ideal functions, record the smallest deviation into lists
     y_delta_list = []
     y_delta_col_list = []
     for test_data_index in range(len(test_data_df)):
         for best_fit_col in best_fit[:-1]:
-            for df_index in range(len(df)):
-                if df['x'][df_index] == test_data_df['x'][test_data_index]:
-                    y_delta = abs(df[best_fit_col][df_index] - test_data_df['y'][test_data_index])
+            for best_fit_df_index in range(len(best_fit_df)):
+                if best_fit_df['x'][best_fit_df_index] == test_data_df['x'][test_data_index]:
+                    y_delta = abs(best_fit_df[best_fit_col][best_fit_df_index] - test_data_df['y'][test_data_index])
                     y_delta_col = best_fit_col
                     break # When X coodinates match, break loop and compare y deviation
 
