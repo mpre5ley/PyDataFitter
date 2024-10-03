@@ -1,11 +1,5 @@
-# data_importer.py
-
 import pandas as pd
-from sqlalchemy.orm import Session
-from sqlalchemy import select
 from sqlalchemy.sql import text
-
-
 
 class DataImporter:
     """ 
@@ -29,7 +23,6 @@ class DataImporter:
         """
         data.to_sql(table_name, self.session.bind, if_exists='replace', index=False)
         self.session.commit()
-        print(f'Imported data into table {table_name}')
 
     def import_data_from_csv(self, file_path, table_name):
         """
