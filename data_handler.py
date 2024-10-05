@@ -57,6 +57,9 @@ class DataImporter:
                 #convert tuples to floats
                 for i in range(len(df[col])):
                     df[col][i] = df[col][i][0]
+
+            for col in col_list:
+                df[col] = df[col].astype(float)
         return df
     
     def copy_table_to_df(self, db_engine, table_name):
@@ -72,4 +75,5 @@ class DataImporter:
         with db_engine.connect() as conn:
             data_result = conn.execute(text("SELECT * FROM " + table_name))
         
-        return (pd.DataFrame(data_result.fetchall(), columns=data_result.keys()))
+        df = pd.DataFrame(data_result.fetchall(), columns=data_result.keys())        
+        return df

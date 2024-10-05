@@ -61,15 +61,17 @@ def main():
     data_import.import_data(test_data_df, 'test_data')
 
     # Visualize training data, best fit ideal functions, and test data
+
+    test_plot = test_data_df.plot(x='x', y='y', kind='scatter', rot=45, title='Test Data and Best Fit Ideal Function')
+    best_fit_df.plot(x='x', y='y40', kind='line', rot=45, ax=test_plot)
+    #plt.savefig('test_data.png')
+
     best_fit_df.plot(x='x', y=['y13', 'y24', 'y36', 'y40'], kind='line', rot=45, subplots=True, title = 'Best Fit Ideal Functions')
-    plt.savefig('best_fit_ideal_functions.png')
+    #plt.savefig('best_fit_ideal_functions.png')
 
     train_data_df.plot(x='x', y=['y1', 'y2', 'y3', 'y4'], kind='line', rot=45, title='Training Data', subplots=True)
-    plt.savefig('training_data.png')
+    #plt.savefig('training_data.png')
 
-    test_plot = test_data_df.plot(x='x', y='y', kind='scatter', rot=45, title='Test Data')
-    best_fit_df.plot(x='x', y='y40', kind='line', rot=45, ax=test_plot)
-    plt.savefig('test_data.png')
     plt.show()
 
     # Close the session and dispose the engine
