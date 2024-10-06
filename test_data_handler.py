@@ -41,3 +41,5 @@ def test_can_load_list_to_df():
     test_df = data.load_list_to_df(db_engine, col_list)
     for col in col_list:
         assert col in test_df.columns
+
+    
