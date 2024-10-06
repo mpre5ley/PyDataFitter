@@ -6,7 +6,7 @@ The Python program uses training data to find four ideal functions. Then those f
 
 ## Built With:
 
-Pandas
+Pandas\
 SQLAlchemy
 PyTest
 NumPy
