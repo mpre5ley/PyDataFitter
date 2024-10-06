@@ -28,7 +28,6 @@ def main():
     db_engine = create_engine('sqlite:///data.db')
     # Create a session
     session_instance = create_session(db_engine)
-
     # Create model to move data to database
     data_import = DataImporter(session_instance)
     # Import data from CSVs to database
