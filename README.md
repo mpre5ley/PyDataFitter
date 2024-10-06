@@ -7,12 +7,12 @@ The Python program uses training data to find four ideal functions. Then those f
 ## Built With:
 
 Pandas\
-SQLAlchemy
-PyTest
-NumPy
-Matplotlib
+SQLAlchemy\
+PyTest\
+NumPy\
+Matplotlib\
 
 ## Contact:
 
-Matthew Presley - @mpresley - matthew.presley@iu-study.org
+Matthew Presley - @mpresley - matthew.presley@iu-study.org\
 Project Link: https://github.com/mpre5ley/PyDataFitter
