@@ -10,7 +10,7 @@ Pandas\
 SQLAlchemy\
 PyTest\
 NumPy\
-Matplotlib\
+Matplotlib
 
 ## Contact:
 
