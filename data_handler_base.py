@@ -1,6 +1,6 @@
 import pandas as pd
 
-class DataImporterBase:
+class DataHandlerBase:
     """ 
     Base Class to handle data
 

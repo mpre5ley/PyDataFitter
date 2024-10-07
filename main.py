@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from data_handler import DataImporter
+from data_handler import DataHandler
 from data_fitter import DataFitter
 import matplotlib.pyplot as plt
 
@@ -29,7 +29,7 @@ def main():
     # Create a session
     session_instance = create_session(db_engine)
     # Create model to move data to database
-    data_import = DataImporter(session_instance)
+    data_import = DataHandler(session_instance)
     # Import data from CSVs to database
     data_import.import_data_from_csv('./dataset/train.csv', 'training_data')
     data_import.import_data_from_csv('./dataset/ideal.csv', 'ideal_function')

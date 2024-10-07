@@ -1,4 +1,4 @@
-from data_handler import DataImporter
+from data_handler import DataHandler
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -35,7 +35,7 @@ def test_can_load_list_to_df():
     # Create a session
     session_instance = create_session(db_engine)
     # Create model to move data to database
-    data = DataImporter(session_instance)
+    data = DataHandler(session_instance)
     # create random list of columns from ideal function table
     col_list = ['y1', 'y2', 'y3']
     test_df = data.load_list_to_df(db_engine, col_list)

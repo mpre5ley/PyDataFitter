@@ -1,8 +1,8 @@
 import pandas as pd
 from sqlalchemy.sql import text
-from data_handler_base import DataImporterBase
+from data_handler_base import DataHandlerBase
 
-class DataImporter(DataImporterBase):
+class DataHandler(DataHandlerBase):
     """ 
     Class to import data into a database 
 
