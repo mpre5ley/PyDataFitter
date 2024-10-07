@@ -1,3 +1,5 @@
+# code can be found at https://github.com/mpre5ley/PyDataFitter
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from data_handler import DataHandler
