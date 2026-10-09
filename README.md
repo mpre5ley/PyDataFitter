@@ -20,6 +20,10 @@ python main.py
 pytest
 ```
 
+## Changes:
+
+See [CHANGES.md](CHANGES.md) for a summary of the fixes and improvements made after the initial submission.
+
 ## Contact:
 
 Matthew Presley - @mpresley - matthew.presley@iu-study.org\
