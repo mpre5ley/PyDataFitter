@@ -1,5 +1,3 @@
-import pandas as pd
-
 class DataHandlerBase:
     """ 
     Base Class to handle data
