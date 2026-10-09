@@ -1,45 +1,50 @@
-from data_handler import DataHandler
+import pandas as pd
+import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from data_handler import DataHandler
+from main import create_session
 
-def create_session(db_engine):
-    """
-    Returns an instance of the database session configuration
-    
-    Args:
-    db_engine (Engine): An instance of the database engine object
-         
-    Returns:
-    session_instance (Session): An instance of the database session 
-                                configuration
-    """
-    base = declarative_base()
-    base.metadata.create_all(db_engine)
-    session = sessionmaker(bind=db_engine)
-    session_instance = session()
-    return session_instance
+@pytest.fixture
+def db_engine(tmp_path):
+    """ Creates a SQLite database engine in a temporary directory """
+    engine = create_engine(f'sqlite:///{tmp_path / "test.db"}')
+    yield engine
+    engine.dispose()
 
-def test_can_load_list_to_df():
+def test_can_load_list_to_df(db_engine):
     """ 
     Tests that the function to load a list of columns from 
     the database to a dataframe works
 
     Args:
-    None
+    db_engine (Engine): A temporary database engine
 
     Returns:
     None
     """
-    # Create a SQLite database engine
-    db_engine = create_engine('sqlite:///data.db')
-    # Create a session
-    session_instance = create_session(db_engine)
     # Create model to move data to database
-    data = DataHandler(session_instance)
+    data = DataHandler(create_session(db_engine))
+    data.import_data_from_csv('./dataset/ideal.csv', 'ideal_function')
     # create random list of columns from ideal function table
     col_list = ['y1', 'y2', 'y3']
     test_df = data.load_list_to_df(db_engine, col_list)
-    for col in col_list:
-        assert col in test_df.columns
+    assert list(test_df.columns) == col_list
+    assert len(test_df) == 400
+    expected = pd.read_csv('./dataset/ideal.csv')[col_list]
+    pd.testing.assert_frame_equal(test_df, expected)
 
-    
+def test_import_and_copy_table_round_trip(db_engine):
+    """ 
+    Tests that data imported into the database can be copied back
+    into an identical dataframe
+
+    Args:
+    db_engine (Engine): A temporary database engine
+
+    Returns:
+    None
+    """
+    data = DataHandler(create_session(db_engine))
+    df = pd.DataFrame({'x': [1.0, 2.0], 'y': [3.0, 4.0]})
+    data.import_data(df, 'round_trip')
+    pd.testing.assert_frame_equal(data.copy_table_to_df(db_engine, 'round_trip'), df)
