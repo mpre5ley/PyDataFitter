@@ -1,5 +1,4 @@
 import pandas as pd
-from sqlalchemy.sql import text
 from data_handler_base import DataHandlerBase
 
 class DataHandler(DataHandlerBase):
@@ -50,18 +49,8 @@ class DataHandler(DataHandlerBase):
         Returns:
         DataFrame: A Pandas DataFrame containing the data
         """
-        df = pd.DataFrame(columns=col_list)
-        with db_engine.connect() as conn:
-            for col in col_list:
-                col_list_result = conn.execute(text("SELECT " + col + " FROM ideal_function"))
-                df[col] = col_list_result.fetchall()
-                #convert tuples to floats
-                for i in range(len(df[col])):
-                    df[col][i] = df[col][i][0]
-
-            for col in col_list:
-                df[col] = df[col].astype(float)
-        return df
+        df = pd.read_sql_table('ideal_function', db_engine, columns=col_list)
+        return df.astype(float)
     
     def copy_table_to_df(self, db_engine, table_name):
         """
@@ -73,8 +62,4 @@ class DataHandler(DataHandlerBase):
         Returns:
         DataFrame: A Pandas DataFrame containing the data
         """
-        with db_engine.connect() as conn:
-            data_result = conn.execute(text("SELECT * FROM " + table_name))
-        
-        df = pd.DataFrame(data_result.fetchall(), columns=data_result.keys())        
-        return df
+        return pd.read_sql_table(table_name, db_engine)

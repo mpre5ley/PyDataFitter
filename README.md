@@ -12,6 +12,14 @@ PyTest\
 NumPy\
 Matplotlib
 
+## Usage:
+
+```
+pip install -r requirements.txt
+python main.py
+pytest
+```
+
 ## Contact:
 
 Matthew Presley - @mpresley - matthew.presley@iu-study.org\
