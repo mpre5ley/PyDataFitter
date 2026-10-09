@@ -1,6 +1,6 @@
 # Summary of Changes
 
-Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `2c4f7bd` (Regenerate data.db with sqrt(2) mapping criterion results).
+Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `7917839` (Add CHANGES.md summarizing changes since 15d6abc and link it from README).
 
 | Commit | Description |
 |---|---|
@@ -9,6 +9,8 @@ Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `2c4f
 | `4c851cd` | Add .gitignore, requirements.txt and usage instructions |
 | `7c34e96` | Merge pull request #1 from mpre5ley/recommended-changes |
 | `2c4f7bd` | Regenerate data.db with sqrt(2) mapping criterion results |
+| `a9ebd80` | Add user-defined DataMismatchError exception |
+| `7917839` | Add CHANGES.md summarizing changes since 15d6abc and link it from README |
 
 ## Bug Fixes
 
@@ -28,6 +30,21 @@ The method had neither a `self` parameter nor `@staticmethod`, and it was never 
 ### Hardcoded function names and list mutation (`main.py`)
 - `main.py` appended `'x'` to `DataFitter.best_fit_functions`, changing the fitter's own results, and `find_delta_y` skipped the last list element to undo this. The `x` column is now requested separately with `['x'] + best_fit_func`.
 - The plots used hardcoded column names (`y13`, `y24`, `y36`, `y40`). They now plot whichever ideal functions were selected, and the test data plot shows all four functions instead of only `y40`.
+
+## Error Handling
+
+### User-defined exception `DataMismatchError` (`data_fitter.py`)
+A new exception class, `DataMismatchError`, is raised when datasets cannot be compared because their x coordinates do not match. Previously both of these cases produced wrong or incomplete results without any warning:
+- `fit_train_data` compares the training data and ideal functions row by row, so it now raises `DataMismatchError` if the x coordinates of the two tables are not identical.
+- `find_delta_y` now raises `DataMismatchError` if a test data x coordinate does not exist in the ideal functions, and lists the missing x values in the message. Previously such a point would have been recorded as not mapped.
+
+`main.py` catches `DataMismatchError`, prints the error message and exits with status 1 instead of showing a traceback. For example, adding a test point at x=99.9 produces:
+
+```
+Error: Test data x coordinates not found in ideal functions: [99.9]
+```
+
+With the provided dataset no exception is raised, and the results are unchanged.
 
 ## Results
 
@@ -49,8 +66,9 @@ Every test point that is still mapped has the same ideal function and deviation 
 - The `load_list_to_df` test now checks the column order and values against `ideal.csv`, not just that the columns exist.
 - New test for an import and read-back round trip through the database.
 - New `test_data_fitter.py` covering the SSE calculation, selection of the closest ideal function, the recorded maximum deviation, and both sides of the sqrt(2) limit.
+- Two tests check that `DataMismatchError` is raised for mismatched training and ideal x coordinates, and for a test x coordinate missing from the ideal functions.
 
-All 5 tests pass on pandas 2.x and pandas 3.0.
+All 7 tests pass on pandas 2.x and pandas 3.0.
 
 ## Housekeeping
 
