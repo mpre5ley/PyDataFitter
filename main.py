@@ -3,8 +3,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from data_handler import DataHandler
-from data_fitter import DataFitter
+from data_fitter import DataFitter, DataMismatchError
 import matplotlib.pyplot as plt
+import sys
 
 def create_session(db_engine):
     """
@@ -71,4 +72,7 @@ def main():
     db_engine.dispose()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except DataMismatchError as error:
+        sys.exit(f"Error: {error}")

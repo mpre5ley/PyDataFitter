@@ -1,6 +1,13 @@
 import pandas as pd
 import numpy as np
 
+class DataMismatchError(Exception):
+    """
+    User-defined exception raised when datasets cannot be compared
+    because their x coordinates do not match
+    """
+    pass
+
 class DataFitter:
     """ 
     Class to fit data using the Sum of Squared Errors method
@@ -58,6 +65,11 @@ class DataFitter:
         df_training = self.load_data(data_table)
         df_ideal = self.load_data(ideal_table)
 
+        # Functions are compared row by row, so the x coordinates must be identical
+        if not df_training['x'].equals(df_ideal['x']):
+            raise DataMismatchError(
+                f"x coordinates in '{data_table}' do not match those in '{ideal_table}'")
+
         # Fit data to ideal functions
         for df_train_col in df_training.columns[1:]:
             best_fit_function = []
@@ -92,6 +104,10 @@ class DataFitter:
         """
         # Line up each test point with the ideal function values at the same x coordinate
         merged = test_data_df[['x', 'y']].merge(best_fit_df, on='x', how='left')
+        missing_x = merged.loc[merged[best_fit_func].isna().any(axis=1), 'x']
+        if not missing_x.empty:
+            raise DataMismatchError(
+                f"Test data x coordinates not found in ideal functions: {missing_x.tolist()}")
 
         y_delta_num = []
         y_delta_func = []
