@@ -41,11 +41,9 @@ def main():
     data_fit = DataFitter(db_engine)
     data_fit.fit_train_data('training_data', 'ideal_function')
     best_fit_func = data_fit.best_fit_functions
-    # Add x column for ideal function x coordinate
-    best_fit_func.append('x')
 
-    # Load best fit ideal functions from database into dataframe
-    best_fit_df = data_import.load_list_to_df(db_engine, best_fit_func)
+    # Load x column and best fit ideal functions from database into dataframe
+    best_fit_df = data_import.load_list_to_df(db_engine, ['x'] + best_fit_func)
     
     # Load test data from database into dataframe
     test_data_df = data_import.copy_table_to_df(db_engine, 'test_data')
@@ -62,9 +60,9 @@ def main():
     data_import.import_data(test_data_df, 'test_data')
 
     # Visualize training data, best fit ideal functions, and test data
-    test_plot = test_data_df.plot(x='x', y='y', kind='scatter', rot=45, title='Test Data and Best Fit Ideal Function')
-    best_fit_df.plot(x='x', y='y40', kind='line', rot=45, ax=test_plot)
-    best_fit_df.plot(x='x', y=['y13', 'y24', 'y36', 'y40'], kind='line', rot=45, subplots=True, title = 'Best Fit Ideal Functions')
+    test_plot = test_data_df.plot(x='x', y='y', kind='scatter', rot=45, title='Test Data and Best Fit Ideal Functions')
+    best_fit_df.plot(x='x', y=best_fit_func, kind='line', rot=45, ax=test_plot)
+    best_fit_df.plot(x='x', y=best_fit_func, kind='line', rot=45, subplots=True, title = 'Best Fit Ideal Functions')
     train_data_df.plot(x='x', y=['y1', 'y2', 'y3', 'y4'], kind='line', rot=45, title='Training Data', subplots=True)
     plt.show()
 

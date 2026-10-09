@@ -1,4 +1,3 @@
-from sqlalchemy.sql import text
 import pandas as pd
 import numpy as np
 
@@ -12,14 +11,17 @@ class DataFitter:
     def __init__(self, engine):
         self.engine = engine
         self.best_fit_functions = []
+        # Largest deviation between each training function and its chosen ideal function
+        self.max_deviations = {}
     
+    @staticmethod
     def calculate_SSE(y_train, y_ideal):
         """
         Calculate the sum of squared errors between the training data and ideal functions
          
         Args:
-        y_train (float): y-coordinate from the training data
-        y_ideal (float): y-coordinate from the ideal functions
+        y_train (Series): y-coordinates from the training data
+        y_ideal (Series): y-coordinates from the ideal functions
           
         Returns:
         float: The sum of squared errors between the training data and ideal functions
@@ -38,10 +40,7 @@ class DataFitter:
         DataFrame: A Pandas DataFrame containing the data
         """
 
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM " + table_name))
-            df = pd.DataFrame(result.fetchall(), columns=result.keys())
-        return df
+        return pd.read_sql_table(table_name, self.engine)
 
     def fit_train_data(self, data_table, ideal_table):
         """
@@ -64,16 +63,21 @@ class DataFitter:
             best_fit_function = []
             best_sse = float('inf')
             for df_ideal_col in df_ideal.columns[1:]:
-                sse = np.sum((df_training[df_train_col] - df_ideal[df_ideal_col])**2)
+                sse = self.calculate_SSE(df_training[df_train_col], df_ideal[df_ideal_col])
                 if sse < best_sse:
                     best_sse = sse
                     best_fit_function = df_ideal_col
             self.best_fit_functions.append(best_fit_function)
+            # Record the largest deviation for the test data mapping criterion
+            self.max_deviations[best_fit_function] = np.max(
+                np.abs(df_training[df_train_col] - df_ideal[best_fit_function]))
 
         
     def find_delta_y(self, best_fit_func, best_fit_df, test_data_df):
         """
-        Find deviation in Y coordinate between test data and best fit ideal functions
+        Find deviation in Y coordinate between test data and best fit ideal functions.
+        A test point is only mapped to an ideal function if its deviation does not
+        exceed the largest training deviation for that function by more than sqrt(2).
          
         Args:
         best_fit_func (list): A list of the best fit ideal functions
@@ -81,38 +85,26 @@ class DataFitter:
         test_data_df (DataFrame): A Pandas DataFrame containing the test data x-y coordinates
           
         Returns:
-        y_delta_num: A list containing the delta in Y coordinate between test data and best fit ideal functions
-        y_delta_func: A list containing the name of the ideal function with the smallest y-coordinate deviation
+        y_delta_num: A list containing the delta in Y coordinate between test data and best fit ideal functions,
+                     or None where no ideal function meets the criterion
+        y_delta_func: A list containing the name of the ideal function with the smallest y-coordinate deviation,
+                      or None where no ideal function meets the criterion
         """
-        # Find deviation in Y coordinate between test data and best fit ideal functions, record the smallest deviation into lists
+        # Line up each test point with the ideal function values at the same x coordinate
+        merged = test_data_df[['x', 'y']].merge(best_fit_df, on='x', how='left')
+
         y_delta_num = []
         y_delta_func = []
-        for test_data_index in range(len(test_data_df)):
-            for best_fit_col in best_fit_func[:-1]:
-                for best_fit_df_index in range(len(best_fit_df)):
-                    if best_fit_df['x'][best_fit_df_index] == test_data_df['x'][test_data_index]:
-                        y_delta = abs(best_fit_df[best_fit_col][best_fit_df_index] - test_data_df['y'][test_data_index])
-                        y_delta_col = best_fit_col
-                        break # When X coodinates match, break loop and compare y deviation
-                # Compare the current deviation to the previous smallest deviation
-                try:
-                    y_delta_small
-                except NameError:
+        for _, row in merged.iterrows():
+            y_delta_small = None
+            y_delta_col_small = None
+            for best_fit_col in best_fit_func:
+                y_delta = abs(row[best_fit_col] - row['y'])
+                within_limit = y_delta <= self.max_deviations[best_fit_col] * np.sqrt(2)
+                if within_limit and (y_delta_small is None or y_delta < y_delta_small):
                     y_delta_small = y_delta
-                    y_delta_col_small = y_delta_col
-                else:
-                    if y_delta < y_delta_small:
-                        y_delta_small = y_delta
-                        y_delta_col_small = y_delta_col
-            # Store y delta and ideal function name in lists for dataframe
+                    y_delta_col_small = best_fit_col
             y_delta_num.append(y_delta_small)
             y_delta_func.append(y_delta_col_small)
-            
-            # Delete variables for next row of test data
-            del y_delta_small
-            del y_delta_col_small
         
         return y_delta_num, y_delta_func
-
-        
-
