@@ -1,6 +1,6 @@
 # Summary of Changes
 
-Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `7917839` (Add CHANGES.md summarizing changes since 15d6abc and link it from README).
+Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `bf34a00` (Remove unused pandas import from data_handler_base.py).
 
 | Commit | Description |
 |---|---|
@@ -11,6 +11,8 @@ Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `7917
 | `2c4f7bd` | Regenerate data.db with sqrt(2) mapping criterion results |
 | `a9ebd80` | Add user-defined DataMismatchError exception |
 | `7917839` | Add CHANGES.md summarizing changes since 15d6abc and link it from README |
+| `2c2613c` | Add DataMismatchError changes to CHANGES.md |
+| `bf34a00` | Remove unused pandas import from data_handler_base.py |
 
 ## Bug Fixes
 
@@ -75,3 +77,4 @@ All 7 tests pass on pandas 2.x and pandas 3.0.
 - Added `.gitignore` for `__pycache__/`, `*.pyc`, `.DS_Store` and `.pytest_cache/`, and stopped tracking the previously committed compiled files and `.DS_Store`.
 - Added `requirements.txt` listing pandas, SQLAlchemy (2.0 or later), NumPy, Matplotlib and pytest.
 - Added a Usage section to `README.md` with install, run and test commands.
+- Removed an unused `pandas` import from `data_handler_base.py`.
