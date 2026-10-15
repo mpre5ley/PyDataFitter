@@ -24,7 +24,9 @@ pytest
 
 ## Dashboard:
 
-A Flask dashboard visualizes the results stored in `data.db` by `main.py`, so run `python main.py` first. To host it locally:
+A Flask dashboard visualizes the results stored in `data.db` by `main.py`. It is deployed at https://pydatafitter.fly.dev/.
+
+To host it locally, run `python main.py` first, then:
 
 ```
 flask --app app run
