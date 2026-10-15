@@ -1,6 +1,6 @@
 # Summary of Changes
 
-Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `bf34a00` (Remove unused pandas import from data_handler_base.py).
+Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `bb8e662` (Add fly.io dashboard URL to README).
 
 | Commit | Description |
 |---|---|
@@ -13,6 +13,8 @@ Changes from commit `15d6abc` (Final commit, added GitHub repo address) to `bf34
 | `7917839` | Add CHANGES.md summarizing changes since 15d6abc and link it from README |
 | `2c2613c` | Add DataMismatchError changes to CHANGES.md |
 | `bf34a00` | Remove unused pandas import from data_handler_base.py |
+| `3bfefe6` | Add Flask dashboard to visualize results |
+| `bb8e662` | Add fly.io dashboard URL to README |
 
 ## Bug Fixes
 
@@ -62,6 +64,15 @@ The same four ideal functions are selected before and after the changes: `y13`, 
 
 Every test point that is still mapped has the same ideal function and deviation as before. `data.db` was regenerated with these results.
 
+## Dashboard
+
+A Flask web dashboard (`app.py`, `templates/index.html`) visualizes the results that `main.py` stores in `data.db`. It is hosted at https://pydatafitter.fly.dev/ and can be run locally with `flask --app app run`.
+
+- `app.py` reuses `DataFitter` to recover the chosen ideal functions and their maximum training deviations, and serves the training data, ideal functions and mapped test data as JSON at `/api/results`.
+- The page renders four views with Plotly.js: summary tiles, each training function against its chosen ideal function, the test data mapping with a per-function filter, the mapping tolerance band and a count of points per function, and a table of all test points. It follows the system dark mode and works on narrow screens.
+- Added `Dockerfile`, `.dockerignore` and `fly.toml` for deployment on fly.io, and Flask and gunicorn to `requirements.txt`.
+- Added a Dashboard section to `README.md` with the hosted URL and the local run and deploy commands.
+
 ## Tests
 
 - `test_data_handler.py` no longer reads the committed `data.db`, so it no longer depends on `main.py` having been run first. Each test builds its own temporary database.
@@ -70,7 +81,9 @@ Every test point that is still mapped has the same ideal function and deviation 
 - New `test_data_fitter.py` covering the SSE calculation, selection of the closest ideal function, the recorded maximum deviation, and both sides of the sqrt(2) limit.
 - Two tests check that `DataMismatchError` is raised for mismatched training and ideal x coordinates, and for a test x coordinate missing from the ideal functions.
 
-All 7 tests pass on pandas 2.x and pandas 3.0.
+- New `test_app.py` checks that the dashboard page renders and that `/api/results` returns the expected pairs, tolerances, counts and test points, using a small temporary database.
+
+All 9 tests pass on pandas 2.x and pandas 3.0.
 
 ## Housekeeping
 
