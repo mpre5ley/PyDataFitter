@@ -10,7 +10,9 @@ Pandas\
 SQLAlchemy\
 PyTest\
 NumPy\
-Matplotlib
+Matplotlib\
+Flask\
+Plotly.js
 
 ## Usage:
 
@@ -18,6 +20,21 @@ Matplotlib
 pip install -r requirements.txt
 python main.py
 pytest
+```
+
+## Dashboard:
+
+A Flask dashboard visualizes the results stored in `data.db` by `main.py`, so run `python main.py` first. To host it locally:
+
+```
+flask --app app run
+```
+
+Then open http://127.0.0.1:5000. To deploy it on [fly.io](https://fly.io) using the included `Dockerfile` and `fly.toml`:
+
+```
+fly launch --no-deploy   # pick an app name, keeps the existing fly.toml
+fly deploy
 ```
 
 ## Changes:
